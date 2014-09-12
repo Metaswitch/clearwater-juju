@@ -27,6 +27,8 @@ then
  then
    val_ip=$(dig +short $val | head -1)
    [ -z "$val_ip" ] || val=$val_ip
+   ##if val_ip is empty getting the system IP
+   [ -z "$val_ip" ] && val=`ip route | grep src | cut -d " " -f 12`
  fi
 fi
 
