@@ -1,17 +1,36 @@
 #!/bin/bash
-set -e
-
+set -ex
+onEC2=false
 key=$1
 val=$(unit-get $1)
 
-if [ "$key" = "public-address" ] &&
-   [ -n "$(dig +short $val | head -1)" ]
+if [ -f $CHARM_DIR/lib/provider.txt ]
 then
-  val=$(curl http://169.254.169.254/latest/meta-data/public-ipv4)
-elif [ "$key" = "private-address" ]
+    PROVIDER=`cat $CHARM_DIR/lib/provider.txt `
+else
+    #checking dirty ec2 hack will work
+    wget  -q http://169.254.169.254/latest/meta-data/public-ipv4 && onEC2=true
+    if ( "$onEC2" == true )
+    then
+	echo "EC2" >  $CHARM_DIR/lib/provider.txt
+    else
+	echo "NOTEC2" >  $CHARM_DIR/lib/provider.txt
+    fi
+fi
+
+if [ "$PROVIDER" == "EC2" ]
 then
-  val_ip=$(dig +short $val | head -1)
-  [ -z "$val_ip" ] || val=$val_ip
+ if [ "$key" = "public-address" ] &&   [ -n "$(dig +short $val | head -1)" ]
+  then
+   val=$(curl http://169.254.169.254/latest/meta-data/public-ipv4)
+ elif [ "$key" = "private-address" ]
+ then
+   val_ip=$(dig +short $val | head -1)
+   [ -z "$val_ip" ] || val=$val_ip
+   ##if val_ip is empty getting the system IP
+   [ -z "$val_ip" ] && val=` hostname --all-ip-addresses | awk '{print $1}'`
+ fi
 fi
 
 echo $val
+

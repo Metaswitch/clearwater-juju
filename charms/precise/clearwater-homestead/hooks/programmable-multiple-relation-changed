@@ -13,8 +13,7 @@ homestead-'$id' '$TTL' IN A '$ip
 if [ "$(relation-get public-address)" != "" ]
 then
   echo nameserver $(relation-get public-address) > /etc/dnsmasq.resolv.conf
-  echo "nameserver 8.8.8.8" >> /etc/dnsmasq.resolv.conf
-  grep -v ^RESOLV_CONF= /etc/default/dnsmasq > /tmp/dnsmasq.$$
+  grep -v ^RESOLV_CONF= /etc/default/dnsmasq > /tmp/dnsmasq.$$ || juju-log "WARNING RESOLV_CONF not found"
   mv /tmp/dnsmasq.$$ /etc/default/dnsmasq
   echo RESOLV_CONF=/etc/dnsmasq.resolv.conf >> /etc/default/dnsmasq
   service dnsmasq restart
