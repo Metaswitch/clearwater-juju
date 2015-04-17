@@ -15,6 +15,6 @@ options:
     description: Comma-separated list of IP addresses of trusted peers
     type: string
   repo:
-    default: http://repo.cw-ngv.com/stable
+    default: http://repo.cw-ngv.com/archive/repo70
     description: The location of the repo server
     type: string
