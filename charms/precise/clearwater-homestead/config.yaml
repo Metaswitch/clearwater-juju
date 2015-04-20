@@ -7,6 +7,6 @@ options:
     description: The location of the SAS server
     type: string
   repo:
-    default: http://repo.cw-ngv.com/stable
+    default: http://repo.cw-ngv.com/archive/repo70
     description: The location of the repo server
     type: string
