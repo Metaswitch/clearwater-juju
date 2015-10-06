@@ -21,11 +21,21 @@ relation-set resources="$RJSON"
 #_sip._tcp.sprout '$TTL' IN SRV 0 0 5054 sprout-'$id'
 #sprout-'$id' '$TTL' IN A '$ip
 
+
 # Update our DNS server
-[ "$(relation-get private-address)" = "" ] || echo nameserver $(relation-get private-address) > /etc/resolvconf/resolv.conf.d/head
-service resolvconf restart
+if [ "$(relation-get private-address)" != "" ]
+then
+    # Update our DNS server
+    [ "$(relation-get public-address)" = "" ] || echo nameserver $(relation-get public-address) >> /etc/resolvconf/resolv.conf.d/head
+    service resolvconf restart
+    #need to check if it works with dnsmasq
+fi
 
-
-# Update Clearwater configuration and restart
-$CHARM_DIR/lib/config_script programmable-multiple
-$CHARM_DIR/lib/restart
+DNSP=`dig +short jujucharms.com|wc -l`
+if [ $DNSP -gt 0 ]
+then 
+    echo "CAN STILL resolve the internet great "
+else
+    echo "Can not resolv jujucharms.com something goes wrong in the upstream dns setttings"
+    exit 2
+fi
