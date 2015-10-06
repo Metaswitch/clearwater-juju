@@ -10,7 +10,7 @@ relation-set domain=$(config-get zone)
 # transmit a JSON with all the action .. make a sequencial build of the JSON for readability
 RJSON=`printf '[ {"rr":"A","alias":"sprout","ttl":"%s","addr":"%s"}' $TTL $ip `
 RJSON=$RJSON`printf ',{"rr":"SRV","alias":"_sip._tcp.sprout","ttl":"%s","priority":"0","weight":"0","port":"5054","target":"sprout-%s"}' $TTL $id`
-RJSON=$RJSON`printf ',{"rr":"A","alias":"bono-%s","ttl":"%s","addr":"%s"}' $id $TTL $ip`
+RJSON=$RJSON`printf ',{"rr":"A","alias":"sprout-%s","ttl":"%s","addr":"%s"}' $id $TTL $ip`
 RJSON=$RJSON',{"rr":"NAPTR","alias":"@ ","ttl":"'$TTL'","order":"1","pref":"1","flag":"S","params":"SIP+D2T","regexp":"\"\"","replace": "_sip._tcp.sprout"}'
 RJSON=$RJSON' ]'
 relation-set resources="$RJSON"
