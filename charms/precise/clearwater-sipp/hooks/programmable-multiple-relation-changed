@@ -6,17 +6,14 @@ TTL=300
 id=$(cut -d/ -f2 <<< $JUJU_UNIT_NAME)
 ip=$(unit-get public-address)
 relation-set domain=$(config-get zone)
-relation-set resources='sipp-'$id' '$TTL' IN A '$ip
+# transmit a JSON with all the action .. make a sequencial build of the JSON for readability
+RJSON=`printf '{"rr":"A","alias":"sipp-%s","ttl":"%s","addr":"%s"}' $id $TTL $ip`
+relation-set resources="$RJSON"
 
 # Update our DNS server
-if [ "$(relation-get private-address)" != "" ]
-then
-  echo nameserver $(relation-get private-address) > /etc/dnsmasq.resolv.conf
-  grep -v ^RESOLV_CONF= /etc/default/dnsmasq > /tmp/dnsmasq.$$
-  mv /tmp/dnsmasq.$$ /etc/default/dnsmasq
-  echo RESOLV_CONF=/etc/dnsmasq.resolv.conf >> /etc/default/dnsmasq
-  service dnsmasq restart
-fi
+[ "$(relation-get private-address)" = "" ] || echo nameserver $(relation-get private-address) > /etc/resolvconf/resolv.conf.d/head
+service resolvconf restart
+
 
 # Update Clearwater configuration and restart
 $CHARM_DIR/lib/config_script programmable-multiple

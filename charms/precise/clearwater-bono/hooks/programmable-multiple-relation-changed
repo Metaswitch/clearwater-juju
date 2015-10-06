@@ -6,22 +6,29 @@ TTL=300
 id=$(cut -d/ -f2 <<< $JUJU_UNIT_NAME)
 ip=$(unit-get public-address)
 relation-set domain=$(config-get zone)
-relation-set resources='@ '$TTL' IN A '$ip'
-@ '$TTL' IN NAPTR 1 1 "S" "SIP+D2T" "" _sip._tcp
-@ '$TTL' IN NAPTR 2 1 "S" "SIP+D2U" "" _sip._udp
-_sip._tcp '$TTL' IN SRV 0 0 5060 bono-'$id'
-_sip._udp '$TTL' IN SRV 0 0 5060 bono-'$id'
-bono-'$id' '$TTL' IN A '$ip
+
+# transmit a JSON with all the action .. make a sequencial build of the JSON for readability
+RJSON=`printf '[ {"rr":"A","alias":"@","ttl":"%s","addr":"%s"}' $TTL $ip `
+RJSON=$RJSON`printf ',{"rr":"SRV","alias":"_sip._tcp ","ttl":"%s","priority":"0","weight":"0","port":"5060","target":"bono-%s"}' $TTL $id`
+RJSON=$RJSON`printf ',{"rr":"SRV","alias":"_sip._udp ","ttl":"%s","priority":"0","weight":"0","port":"5060","target":"bono-%s"}' $TTL $id`
+RJSON=$RJSON`printf ',{"rr":"A","alias":"bono-%s","ttl":"%s","addr":"%s"}' $id $TTL $ip`
+RJSON=$RJSON',{"rr":"NAPTR","alias":"@ ","ttl":"'$TTL'","order":"1","pref":"1","flag":"S","params":"SIP+D2T","regexp":"\"\"","replace": "_sip._tcp"}'
+RJSON=$RJSON',{"rr":"NAPTR","alias":"@ ","ttl":"'$TTL'","order":"2","pref":"1","flag":"S","params":"SIP+D2U","regexp":"\"\"","replace": "_sip._udp"}'
+RJSON=$RJSON' ]'
+relation-set resources="$RJSON"
+
+
+## the result in you db.zone whould be :
+#'@ '$TTL' IN A '$ip'54.157.253.111
+#@ '$TTL' IN NAPTR 1 1 "S" "SIP+D2T" "" _sip._tcp
+#@ '$TTL' IN NAPTR 2 1 "S" "SIP+D2U" "" _sip._udp
+#_sip._tcp '$TTL' IN SRV 0 0 5060 bono-'$id'
+#_sip._udp '$TTL' IN SRV 0 0 5060 bono-'$id'
+#bono-'$id' '$TTL' IN A '$ip
 
 # Update our DNS server
-if [ "$(relation-get private-address)" != "" ]
-then
-  echo nameserver $(relation-get private-address) > /etc/dnsmasq.resolv.conf
-  grep -v ^RESOLV_CONF= /etc/default/dnsmasq > /tmp/dnsmasq.$$
-  mv /tmp/dnsmasq.$$ /etc/default/dnsmasq
-  echo RESOLV_CONF=/etc/dnsmasq.resolv.conf >> /etc/default/dnsmasq
-  service dnsmasq restart
-fi
+[ "$(relation-get private-address)" = "" ] || echo nameserver $(relation-get private-address) > /etc/resolvconf/resolv.conf.d/head
+service resolvconf restart
 
 # Update Clearwater configuration and restart
 $CHARM_DIR/lib/config_script programmable-multiple
