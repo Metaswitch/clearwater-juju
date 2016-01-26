@@ -7,14 +7,9 @@ apt-get -y install chef git libxml2-dev libxslt1-dev wget curl
 # Pull down the Clearwater chef recipes
 if [ ! -d /home/ubuntu/chef-solo ]
 then
-  mkdir /home/ubuntu/chef-solo
-  git clone --recursive git://github.com/Metaswitch/chef.git /home/ubuntu/chef-solo
+  mkdir -p /home/ubuntu/chef-solo
+  tar xzf $CHARM_DIR/lib/chef-solo.tgz
 fi
-
-# Update the chef recipes
-cd /home/ubuntu/chef-solo
-git checkout stable
-git submodule update --init
 
 # Create the solo.rb file
 cat > /home/ubuntu/chef-solo/solo.rb <<EOP
