@@ -5,11 +5,8 @@
 apt-get -y install chef git libxml2-dev libxslt1-dev wget curl
 
 # Pull down the Clearwater chef recipes
-if [ ! -d /home/ubuntu/chef-solo ]
-then
-  mkdir -p /home/ubuntu/chef-solo
-  tar xzf $CHARM_DIR/lib/chef-solo.tgz
-fi
+cd /home/ubuntu &&  tar xzf $CHARM_DIR/lib/chef-solo.tgz
+
 
 # Create the solo.rb file
 cat > /home/ubuntu/chef-solo/solo.rb <<EOP
