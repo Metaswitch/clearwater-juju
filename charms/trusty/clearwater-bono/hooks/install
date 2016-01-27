@@ -4,6 +4,8 @@ set -e
 if ! grep "# added by clearwater-*/hooks/install" /etc/hosts ; then
   public_ip=$(unit-get public-address)
   echo "$public_ip bono-$(cut -d/ -f2 <<< $JUJU_UNIT_NAME).$(config-get zone) # added by clearwater-*/hooks/install" >>/etc/hosts
+  #Avoid error in monit for because of name resolution before dns is set
+  echo "$private_ip "`uname -n`>>/etc/hosts
 fi
 
 # Install chef solo, and create the node.json and config file
