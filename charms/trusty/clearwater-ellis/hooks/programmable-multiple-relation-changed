@@ -1,0 +1,32 @@
+#!/bin/bash
+set -e
+
+# Set our DNS requirements
+id=$(cut -d/ -f2 <<< $JUJU_UNIT_NAME)
+ip=$(unit-get public-address)
+relation-set domain=$(config-get zone)
+DNS_JSON=$($CHARM_DIR/lib/generate_dns_records $ip ellis ellis-$id)
+relation-set resources="$DNS_JSON"
+
+# Update our DNS server
+if [ "$(relation-get private-address)" != "" ]
+then
+  echo nameserver $(relation-get private-address) > /etc/dnsmasq.resolv.conf
+  grep -v ^RESOLV_CONF= /etc/default/dnsmasq > /tmp/dnsmasq.$$
+  mv /tmp/dnsmasq.$$ /etc/default/dnsmasq
+  echo RESOLV_CONF=/etc/dnsmasq.resolv.conf >> /etc/default/dnsmasq
+  # Disable caching of negative responses - this prevents failures if we start querying before the
+  # DNS charm has updated its records.
+  #
+  # This is needed for Ellis because:
+  #   * Ellis sends a ping request to Homer and Homestead on startup, so suffers from bad DNS
+  #     records on startup
+  #   * We don't have any way to wait until the DNS server has definitely updated before restarting
+  #   Ellis.
+  sed -i "s/#no-negcache/no-negcache/g" /etc/dnsmasq.conf
+  service dnsmasq restart
+fi
+
+# Update Clearwater configuration and restart
+$CHARM_DIR/lib/config_script programmable-multiple
+$CHARM_DIR/lib/restart

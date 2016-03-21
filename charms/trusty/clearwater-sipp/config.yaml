@@ -1,0 +1,13 @@
+options:
+  zone:
+    default: "clearwater.local"
+    description: The DNS root zone for this service
+    type: string
+  repo:
+    default: http://repo.cw-ngv.com/stable
+    description: The location of the repo server
+    type: string
+  user_count:
+    default: 40000
+    description: The number of emulated SIP endpoints
+    type: int
