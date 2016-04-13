@@ -2,4 +2,4 @@
   # Deployment-wide options
   # These options should be set to the same value for all Clearwater charms (i.e. the same as in bundle-config.yaml.example)
   zone: "ims.clearwater.local"
-  repo: "http://repo.cw-ngv.com/stable"
+  repo: "http://repo.cw-ngv.com/juju-clearwater-2"
