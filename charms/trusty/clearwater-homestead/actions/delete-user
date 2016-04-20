@@ -1,0 +1,9 @@
+#!/bin/bash
+set -e
+
+# Get the configuration and action parameters.
+home_domain=$(config-get zone)
+number=$(action-get number)
+
+# Delete the user.
+sudo -S /usr/share/clearwater/bin/delete_user -y $number $home_domain
