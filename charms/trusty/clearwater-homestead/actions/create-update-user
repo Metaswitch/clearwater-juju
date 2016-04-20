@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -ex
 
 # Get the configuration and action parameters.
 home_domain=$(config-get zone)
