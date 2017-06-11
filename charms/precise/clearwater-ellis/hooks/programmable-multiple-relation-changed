@@ -2,12 +2,11 @@
 set -e
 
 # Set our DNS requirements
-TTL=300
 id=$(cut -d/ -f2 <<< $JUJU_UNIT_NAME)
 ip=$(unit-get public-address)
 relation-set domain=$(config-get zone)
-relation-set resources='ellis '$TTL' IN A '$ip'
-ellis-'$id' '$TTL' IN A '$ip
+DNS_JSON=$($CHARM_DIR/lib/generate_dns_records $ip ellis ellis-$id)
+relation-set resources="$DNS_JSON"
 
 # Update our DNS server
 if [ "$(relation-get private-address)" != "" ]

@@ -2,14 +2,11 @@
 set -e
 
 # Set our DNS requirements
-TTL=300
 id=$(cut -d/ -f2 <<< $JUJU_UNIT_NAME)
 ip=$(unit-get private-address)
 relation-set domain=$(config-get zone)
-relation-set resources='sprout '$TTL' IN A '$ip'
-sprout '$TTL' IN NAPTR 1 1 "S" "SIP+D2T" "" _sip._tcp.sprout
-_sip._tcp.sprout '$TTL' IN SRV 0 0 5054 sprout-'$id'
-sprout-'$id' '$TTL' IN A '$ip
+DNS_JSON=$($CHARM_DIR/lib/generate_dns_records $ip sprout sprout-$id 5054 _sip._tcp.sprout)
+relation-set resources="$DNS_JSON"
 
 # Update our DNS server
 if [ "$(relation-get private-address)" != "" ]
