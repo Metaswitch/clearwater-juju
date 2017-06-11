@@ -15,3 +15,5 @@ requires:
 provides:
   as-catalog:
     interface: as-register
+  ellis-api:
+    interface: api-client
