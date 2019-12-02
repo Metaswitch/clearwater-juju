@@ -1,3 +1,5 @@
+Project Clearwater is backed by Metaswitch Networks.  We have discontinued active support for this project as of 1st December 2019.  The mailing list archive is available in GitHub.  All of the documentation and source code remains available for the community in GitHub.  Metaswitch’s Clearwater Core product, built on Project Clearwater, remains an active and successful commercial offering.  Please contact clearwater@metaswitch.com for more information.
+
 # Overview
 
 This repository contains a collection of [Juju charms and deployment bundles](https://jujucharms.com/about), which support deployment and scaling of a [Project Clearwater](http://www.projectclearwater.org) IMS core.
@@ -29,11 +31,3 @@ This repository contains Amulet tests for automated testing. To run them, use:
     git clone https://github.com/Metaswitch/clearwater-juju.git
     cd clearwater-juju
     JUJU_REPOSITORY=charms juju test -o logs -v -p JUJU_REPOSITORY,HOME --timeout=1200s
-
-# Contact and Upstream Project Information
-
-Project Clearwater is an open-source IMS core, developed by [Metaswitch Networks](http://www.metaswitch.com) and released under the [GNU GPLv3](http://www.projectclearwater.org/download/license/). You can find more information about it on [our website](http://www.projectclearwater.org/) or [our documentation site](https://clearwater.readthedocs.org).
-
-Clearwater source code and issue trackers can be found at https://github.com/Metaswitch/.
-
-If you have problems when using Project Clearwater, read [our troubleshooting documentation](http://clearwater.readthedocs.org/en/latest/Troubleshooting_and_Recovery/index.html) for help, or see [our support page](http://clearwater.readthedocs.org/en/latest/Support/index.html) to find out how to ask mailing list questions or raise issues.
